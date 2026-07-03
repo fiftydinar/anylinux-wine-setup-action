@@ -76,7 +76,7 @@ exe_path=""
 all_exes=""
 trace=""
 
-# Map Windows drive letter to Linux path prefix (from winedllpath.sh)
+# Map Windows drive letter to Linux path prefix
 map_path() {
   winpath="$1"
   case "$winpath" in
@@ -103,7 +103,7 @@ map_path() {
   esac
 }
 
-# Decode Unicode escapes, normalize backslashes, shorten home (from winedllpath.sh)
+# Decode Unicode escapes, normalize backslashes, shorten home
 cleanpath() {
   result="$1"
   result=$(printf '%s' "$result" | awk '
