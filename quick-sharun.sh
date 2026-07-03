@@ -1645,6 +1645,7 @@ _wine_fixes_after_deploy() {
 	if [ -f /usr/lib/wine/x86_64-unix/wine ]; then
 		rm -f "$APPDIR"/lib/wine/x86_64-unix/wine
 		cp /usr/lib/wine/x86_64-unix/wine "$APPDIR"/lib/wine/x86_64-unix/wine
+	fi
 
 	cat <<HOOKEOF > "$DST_BIN_DIR"/force-portable-home.hook
 #!/bin/sh
