@@ -34,7 +34,8 @@ cat <<EOF > ./AppDir/bin/"$WINE_MAIN_BIN"
 if [ ! -d "\${WINEPREFIX}" ]; then
     wineboot
 fi
-wine "\${WINEPREFIX}/${WINE_MAIN_BIN}" "\$@"
+cp -rn \${APPDIR}/share/"${WINE_MAIN_BIN}" "\${WINEPREFIX}"
+wine "\${WINEPREFIX}/${WINE_MAIN_BIN}/${WINE_MAIN_BIN}" "\$@"
 EOF
 
 echo "WINEPREFIX=\${XDG_DATA_HOME}/anylinux-wine/${WINE_MAIN_BIN}" >> ./AppDir/.env
