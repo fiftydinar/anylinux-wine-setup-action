@@ -13,7 +13,6 @@ runs:
         DEBLOATED_PACKAGES=${DEBLOATED_PACKAGES:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/get-debloated-pkgs.sh}
         MAKE_AUR_PACKAGE=${MAKE_AUR_PACKAGE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/make-aur-package.sh}
         WINE_STRACE=${WINE_STRACE:-https://raw.githubusercontent.com/fiftydinar/anylinux-wine-setup-action/refs/heads/main/wine-strace.sh}
-        WINE_FIXES_AFTER_DEPLOY=${WINE_FIXES_AFTER_DEPLOY:-https://raw.githubusercontent.com/fiftydinar/anylinux-wine-setup-action/refs/heads/main/wine-fixes-after-deploy.sh}
         ANYLINUX_TOOLS_DIR=${ANYLINUX_TOOLS_DIR:-/usr/local/bin}
 
         _get_anylinux_tool() {
@@ -71,7 +70,6 @@ runs:
         _get_anylinux_tool "$ANYLINUX_TOOLS_DIR"/get-debloated-pkgs "$DEBLOATED_PACKAGES"
         _get_anylinux_tool "$ANYLINUX_TOOLS_DIR"/make-aur-package "$MAKE_AUR_PACKAGE"
         _get_anylinux_tool "$ANYLINUX_TOOLS_DIR"/wine-strace "$WINE_STRACE"
-        _get_anylinux_tool "$ANYLINUX_TOOLS_DIR"/wine-fixes-after-deploy "$WINE_FIXES_AFTER_DEPLOY"
 
         chmod +x "$ANYLINUX_TOOLS_DIR"/*
 
