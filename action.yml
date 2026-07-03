@@ -1,0 +1,81 @@
+---
+name: "AnyLinux Tools Setup (Arch)"
+description: "Downloads and installs Anylinux packaging tools and dependencies"
+runs:
+  using: "composite"
+  steps:
+    - name: Execute Setup Script
+      shell: sh
+      run: |
+        set -e
+
+        QUICK_SHARUN=${QUICK_SHARUN:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/quick-sharun.sh}
+        DEBLOATED_PACKAGES=${DEBLOATED_PACKAGES:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/get-debloated-pkgs.sh}
+        MAKE_AUR_PACKAGE=${MAKE_AUR_PACKAGE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/make-aur-package.sh}
+        WINE_STRACE=${WINE_STRACE:-https://raw.githubusercontent.com/fiftydinar/anylinux-wine-setup-action/refs/heads/main/wine-strace.sh}
+        ANYLINUX_TOOLS_DIR=${ANYLINUX_TOOLS_DIR:-/usr/local/bin}
+
+        _get_anylinux_tool() {
+            echo "DOWNLOADING '$2' to '$1'"
+            wget --retry-connrefused --tries=30 -O "$@"
+        }
+
+        echo "Installing basic packaging dependencies..."
+        echo "---------------------------------------------------------------"
+
+        pacman-key --init
+        pacman -Syy --noconfirm archlinux-keyring
+        pacman -Syu --noconfirm \
+            7zip \
+            base-devel \
+            freetype2 \
+            git \
+            jq \
+            libx11 \
+            libxrandr \
+            libxss \
+            nspr \
+            nss \
+            nss-mdns \
+            nss-myhostname \
+            patchelf \
+            pulseaudio \
+            pulseaudio-alsa \
+            unzip \
+            wget \
+            xorg-server-xvfb \
+            zsync \
+            wine \
+            cabextract \
+            sdl2 \
+            pipewire-audio \
+            pipewire-jack \
+            harfbuzz \
+            gst-plugins-bad \
+            gst-plugins-base \
+            gst-plugins-base-libs \
+            gst-plugins-good \
+            gst-plugins-ugly \
+            gst-libav gstreamer
+            
+        ARCH=$(uname -m)
+        if [ "$ARCH" = 'x86_64' ]; then
+            pacman -Syu --noconfirm mingw-w64-binutils
+        fi
+
+        wget --retry-connrefused --tries=30  https://github.com/aquasecurity/tfsec/releases/latest/download/zenity-rs-$ARCH-linux -O /usr/bin/zenity 
+        chmod +x /usr/bin/zenity
+        wget --retry-connrefused --tries=30 https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks -O /usr/bin/winetricks
+        chmod +x /usr/bin/winetricks
+        
+        _get_anylinux_tool "$ANYLINUX_TOOLS_DIR"/quick-sharun "$QUICK_SHARUN"
+        _get_anylinux_tool "$ANYLINUX_TOOLS_DIR"/get-debloated-pkgs "$DEBLOATED_PACKAGES"
+        _get_anylinux_tool "$ANYLINUX_TOOLS_DIR"/make-aur-package "$MAKE_AUR_PACKAGE"
+        _get_anylinux_tool "$ANYLINUX_TOOLS_DIR"/wine-strace "$WINE_STRACE"
+
+        chmod +x \
+            "$ANYLINUX_TOOLS_DIR"/quick-sharun \
+            "$ANYLINUX_TOOLS_DIR"/get-debloated-pkgs \
+            "$ANYLINUX_TOOLS_DIR"/make-aur-package
+
+        echo "CONTAINER IS READY! Tools installed in $ANYLINUX_TOOLS_DIR."
