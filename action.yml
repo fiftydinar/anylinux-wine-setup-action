@@ -9,7 +9,7 @@ runs:
       run: |
         set -e
 
-        QUICK_SHARUN=${QUICK_SHARUN:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/quick-sharun.sh}
+        QUICK_SHARUN=${QUICK_SHARUN:-https://raw.githubusercontent.com/fiftydinar/anylinux-wine-setup-action/refs/heads/main/quick-sharun.sh}
         DEBLOATED_PACKAGES=${DEBLOATED_PACKAGES:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/get-debloated-pkgs.sh}
         MAKE_AUR_PACKAGE=${MAKE_AUR_PACKAGE:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/make-aur-package.sh}
         WINE_STRACE=${WINE_STRACE:-https://raw.githubusercontent.com/fiftydinar/anylinux-wine-setup-action/refs/heads/main/wine-strace.sh}
