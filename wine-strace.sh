@@ -163,8 +163,12 @@ case "$1" in
     rm -rf "$WINEPREFIX"
 	mkdir -p "$WINEPREFIX"
     _echo "* Creating fresh prefix..."
-    WINEDLLOVERRIDES="mscoree=d;mshtml=d" wine wineboot -u 2>/dev/null
-    trace=$(mktemp /tmp/wine-trace-XXXXXX.txt)
+   if [ -n "$XVFB_CMD" ]; then
+     $XVFB_CMD env WINEDLLOVERRIDES="mscoree=d;mshtml=d" wine wineboot -u 2>/dev/null
+   else
+     WINEDLLOVERRIDES="mscoree=d;mshtml=d" wine wineboot -u 2>/dev/null
+   fi
+   trace=$(mktemp /tmp/wine-trace-XXXXXX.txt)
 
     for exe in $all_exes; do
       _echo "STRACE: [$exe] ..."
