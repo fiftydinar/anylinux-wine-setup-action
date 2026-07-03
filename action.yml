@@ -64,7 +64,7 @@ runs:
             pacman -Syu --noconfirm mingw-w64-binutils
         fi
 
-        wget --retry-connrefused --tries=30  https://github.com/aquasecurity/tfsec/releases/latest/download/zenity-rs-$ARCH-linux -O /usr/bin/zenity 
+        wget --retry-connrefused --tries=30  https://github.com/QaidVoid/zenity-rs/releases/latest/download/zenity-rs-$ARCH-linux -O /usr/bin/zenity 
         wget --retry-connrefused --tries=30 https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks -O /usr/bin/winetricks
         
         _get_anylinux_tool "$ANYLINUX_TOOLS_DIR"/quick-sharun "$QUICK_SHARUN"
