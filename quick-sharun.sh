@@ -1664,7 +1664,7 @@ export WINE_HOST_XDG_CACHE_HOME="$XDG_CACHE_HOME"
 HOOKEOF
 	chmod +x "$DST_BIN_DIR"/*.hook
 
-	echo "WINEPREFIX=\${XDG_DATA_HOME}/anylinux-wine/${WINE_MAIN_BIN}" >> "$APPDIR"/.env
+	echo "WINEPREFIX=\${XDG_DATA_HOME}/anylinux-wine/${WINE_MAIN_BIN%.exe}" >> "$APPDIR"/.env
 
 	# Set the lib path to also use wine libs
 	echo 'LD_LIBRARY_PATH=${APPDIR}/lib:${APPDIR}/lib/pulseaudio:${APPDIR}/lib/alsa-lib:${APPDIR}/lib/wine/x86_64-unix' >> "$APPDIR"/.env
