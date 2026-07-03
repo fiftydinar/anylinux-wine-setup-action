@@ -16,9 +16,16 @@ patchelf --set-interpreter /tmp/"$kek" ./AppDir/lib/wine/x86_64-unix/wine
 # so we will ahve to make sure anylinux.so loads by adding it as a dependency to the libc
 patchelf --add-needed anylinux.so ./AppDir/shared/lib/libc.so.6
 
-cat <<EOF > ./AppDir/bin/random-linker.src.hook
+cat <<EOF > ./AppDir/bin/random-linker.hook
 #!/bin/sh
 cp -f "\$APPDIR"/shared/lib/ld-linux*.so* /tmp/"$kek"
+EOF
+
+cat <<EOF > ./AppDir/bin/force-portable-home.hook
+#!/bin/sh
+# wine ignores the HOME env var, which means --appimage-portable-home does not work normally
+export WINEPREFIX="${WINEPREFIX:-$HOME/.wine}"
+export WINE_HOST_XDG_CACHE_HOME="$XDG_CACHE_HOME"
 EOF
 chmod +x ./AppDir/bin/*.hook
 
