@@ -31,7 +31,7 @@ chmod +x ./AppDir/bin/*.hook
 
 cat <<EOF > ./AppDir/bin/"$WINE_MAIN_BIN"
 #!/bin/sh
-if [ ! -d "\${WINEPREFIX}/.wine" ]; then
+if [ ! -d "\${WINEPREFIX}" ]; then
     wineboot
 fi
 wine "\${WINEPREFIX}/${WINE_MAIN_BIN}" "\$@"
