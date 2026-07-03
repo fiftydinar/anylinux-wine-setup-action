@@ -508,42 +508,8 @@ for sysdir in /usr/lib/wine/i386-windows /usr/lib/wine/x86_64-windows; do
   [ "$count" -gt 0 ] && _echo "  Removed $count files ($size bytes)"
 done
 
-# Unix-side .so builtins in -unix/ dirs
-# Map .so name to PE module name by trying .dll, .drv, .sys extensions
-# .so files with no PE counterpart are internal backends loaded through
-# the unixlib interface, invisible to +loaddll traces — always kept
-internal_keep="gphoto2.so sane.so winealsa.so winepulse.so"
-for unixdir in /usr/lib/wine/x86_64-unix /usr/lib/wine/i386-unix; do
-  [ -d "$unixdir" ] || continue
-  [ ! -w "$unixdir" ] && s=sudo || s=
-  _echo "Cleaning: $unixdir"
-
-  count=0; size=0
-  for f in "$unixdir"/*.so; do
-    [ -f "$f" ] || continue
-    base=$(basename "$f")
-    name="${base%.so}"
-
-    # Always keep Wine-internal modules
-    found=0
-    for k in $internal_keep; do [ "$base" = "$k" ] && { found=1; break; }; done
-    [ "$found" = 1 ] && continue
-
-    # Check PE module mapping: try .dll, .drv, .sys
-    for ext in dll drv sys; do
-      pe="${name}.${ext}"
-      for k in $keep_all; do
-        [ "$pe" = "$k" ] && { found=1; break; }
-      done
-      [ "$found" = 1 ] && break
-    done
-
-    if [ "$found" = 0 ]; then
-      sz=$($s stat -c%s "$f" 2>/dev/null || echo 0)
-      $s rm -f "$f"
-      size=$((size + sz))
-      count=$((count + 1))
-    fi
-  done
-  [ "$count" -gt 0 ] && _echo "  Removed $count files ($size bytes)"
-done
+# Unix-side .so builtins in -unix/ dirs are wine internal modules loaded
+# through the unixlib interface, invisible to +loaddll traces.
+# These are never removed — wine needs them regardless of what PE modules
+# were loaded during tracing.
+_echo "Skipping: -unix/ directories (wine internal modules, not PE stubs)"
