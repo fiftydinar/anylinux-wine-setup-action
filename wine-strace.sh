@@ -164,6 +164,11 @@ if [ -d "$1" ]; then
       exit 1
     fi
 
+    _echo "* Found executables in $app_dir:"
+    for exe in $all_exes; do
+      _echo " - $exe"
+    done
+
 elif _is_pe "$1"; then
     exe_path="$1"
     app_dir=$(dirname "$exe_path")
