@@ -2991,7 +2991,7 @@ echo ""
 if [ -n "$WINE_MAIN_BIN" ]; then
 	cat <<EOF > "$DST_BIN_DIR"/"$MAIN_BIN"
 #!/bin/sh
-. "\${APPDIR}/.env"
+: "\${WINEPREFIX:=\${XDG_DATA_HOME}/anylinux-wine/${WINE_MAIN_BIN%.exe}}"
 if [ ! -d "\${WINEPREFIX}" ]; then
     wineboot
 fi
