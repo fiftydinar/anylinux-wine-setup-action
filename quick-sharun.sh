@@ -2755,22 +2755,7 @@ _handle_nested_bins() {
 _check_main_bin() {
 	if [ -z "$MAIN_BIN" ]; then
 		MAIN_BIN=$(awk -F'=| ' '/^Exec=/{print $2; exit}' "$DESKTOP_ENTRY" | tr -d "\"'")
-MAIN_BIN=${MAIN_BIN##*/}
-
-# WINE_MAIN_BIN: Wine app main executable (e.g. "rufus.exe")
-# Strips .exe for the binary name, keeps .exe for StartupWMClass
-if [ -n "$WINE_MAIN_BIN" ]; then
-	WINE_MAIN_BIN=${WINE_MAIN_BIN##*/}
-	case "$WINE_MAIN_BIN" in
-		*.exe|*.EXE) ;;
-		*)
-			_err_msg "ERROR: WINE_MAIN_BIN='$WINE_MAIN_BIN' must end with .exe or .EXE"
-			exit 1
-			;;
-	esac
-	MAIN_BIN=${WINE_MAIN_BIN%.exe}
-	STARTUPWMCLASS=${STARTUPWMCLASS:-$WINE_MAIN_BIN}
-fi
+		MAIN_BIN=${MAIN_BIN##*/}
 		case "$MAIN_BIN" in
 			env|sh|bash)
 				_err_msg "Main binary is '$MAIN_BIN', it is unlikely you"
@@ -2793,6 +2778,21 @@ fi
 	_err_msg "entry in '$APPDIR', make sure to add the correct desktop entry"
 	exit 1
 }
+
+# WINE_MAIN_BIN: Wine app main executable (e.g. "rufus.exe")
+# Strips .exe for the binary name, keeps .exe for StartupWMClass
+if [ -n "$WINE_MAIN_BIN" ]; then
+	WINE_MAIN_BIN=${WINE_MAIN_BIN##*/}
+	case "$WINE_MAIN_BIN" in
+		*.exe|*.EXE) ;;
+		*)
+			_err_msg "ERROR: WINE_MAIN_BIN='$WINE_MAIN_BIN' must end with .exe or .EXE"
+			exit 1
+			;;
+	esac
+	MAIN_BIN=${WINE_MAIN_BIN%.exe}
+	STARTUPWMCLASS=${STARTUPWMCLASS:-$WINE_MAIN_BIN}
+fi
 
 _make_static_bin() (
 	ONELF=$TMPDIR/onelf
