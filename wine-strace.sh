@@ -161,6 +161,7 @@ case "$1" in
     _echo "* Removing existing prefix..."
     wineserver -k 2>/dev/null
     rm -rf "$WINEPREFIX"
+	mkdir -p "$WINEPREFIX"
     _echo "* Creating fresh prefix..."
     WINEDLLOVERRIDES="mscoree=d;mshtml=d" wine wineboot -u 2>/dev/null
     trace=$(mktemp /tmp/wine-trace-XXXXXX.txt)
