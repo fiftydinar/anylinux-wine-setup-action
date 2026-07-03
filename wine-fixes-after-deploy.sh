@@ -28,15 +28,6 @@ export WINE_HOST_XDG_CACHE_HOME="$XDG_CACHE_HOME"
 EOF
 chmod +x ./AppDir/bin/*.hook
 
-cat <<EOF > ./AppDir/bin/"$WINE_MAIN_BIN"
-#!/bin/sh
-if [ ! -d "\${WINEPREFIX}" ]; then
-    wineboot
-fi
-cp -rn \${APPDIR}/share/"${WINE_MAIN_BIN}" "\${WINEPREFIX}"
-wine "\${WINEPREFIX}/${WINE_MAIN_BIN}/${WINE_MAIN_BIN}" "\$@"
-EOF
-
 echo "WINEPREFIX=\${XDG_DATA_HOME}/anylinux-wine/${WINE_MAIN_BIN}" >> ./AppDir/.env
 
 chmod +x ./AppDir/bin/*.hook
