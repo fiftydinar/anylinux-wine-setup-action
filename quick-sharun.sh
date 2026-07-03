@@ -2990,11 +2990,11 @@ if [ -n "$WINE_MAIN_BIN" ]; then
 	cat <<EOF > "$DST_BIN_DIR"/"$MAIN_BIN"
 #!/bin/sh
 WINEPREFIX="\${XDG_DATA_HOME}/anylinux-wine/${WINE_MAIN_BIN%.exe}"
-mkdir -p "\${WINEPREFIX%/*}"
-if [ ! -d "\${WINEPREFIX}" ]; then
+mkdir -p "\${WINEPREFIX}"
+cp -rn "\${APPDIR}/share/${WINE_MAIN_BIN%.exe}/." "\${WINEPREFIX}"
+if [ ! -f "\${WINEPREFIX}/system.reg" ]; then
     wineboot
 fi
-cp -rn "\${APPDIR}/share/${WINE_MAIN_BIN%.exe}/." "\${WINEPREFIX}"
 wine "\${WINEPREFIX}/${WINE_MAIN_BIN}" "\$@"
 EOF
 	chmod +x "$DST_BIN_DIR"/"$MAIN_BIN"
