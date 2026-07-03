@@ -1641,8 +1641,13 @@ _wine_fixes_after_deploy() {
 		ln -sr "$APPDIR"/lib/wine/x86_64-unix/*.so* "$DST_BIN_DIR" 2>/dev/null || :
 	fi
 
-	# Wine binary gets broken by sharun, no fix needed for static builds
-	# (wine-preloader and wine are the same multi-call binary)
+	# Wine binary gets broken by sharun — copy and tweak to break hardlink
+	# so wine-preloader can find a separate wine binary (not itself)
+	if [ -f "$DST_BIN_DIR"/wine ]; then
+		rm -f "$APPDIR"/lib/wine/x86_64-unix/wine
+		cp "$DST_BIN_DIR"/wine "$APPDIR"/lib/wine/x86_64-unix/wine
+		printf '\0' >> "$APPDIR"/lib/wine/x86_64-unix/wine
+	fi
 
 	cat <<HOOKEOF > "$DST_BIN_DIR"/force-portable-home.hook
 #!/bin/sh
