@@ -2761,6 +2761,13 @@ MAIN_BIN=${MAIN_BIN##*/}
 # Strips .exe for the binary name, keeps .exe for StartupWMClass
 if [ -n "$WINE_MAIN_BIN" ]; then
 	WINE_MAIN_BIN=${WINE_MAIN_BIN##*/}
+	case "$WINE_MAIN_BIN" in
+		*.exe|*.EXE) ;;
+		*)
+			_err_msg "ERROR: WINE_MAIN_BIN='$WINE_MAIN_BIN' must end with .exe or .EXE"
+			exit 1
+			;;
+	esac
 	MAIN_BIN=${WINE_MAIN_BIN%.exe}
 	STARTUPWMCLASS=${STARTUPWMCLASS:-$WINE_MAIN_BIN}
 fi
@@ -2987,8 +2994,8 @@ if [ -n "$WINE_MAIN_BIN" ]; then
 if [ ! -d "\${WINEPREFIX}" ]; then
     wineboot
 fi
-cp -rn \${APPDIR}/share/"${WINE_MAIN_BIN}" "\${WINEPREFIX}"
-wine "\${WINEPREFIX}/${WINE_MAIN_BIN}/${WINE_MAIN_BIN}" "\$@"
+cp -rn "\${APPDIR}/share/${WINE_MAIN_BIN}" "\${WINEPREFIX}"
+wine "\${WINEPREFIX}/${WINE_MAIN_BIN}/${WINE_MAIN_BIN}.exe" "\$@"
 EOF
 	chmod +x "$DST_BIN_DIR"/"$WINE_MAIN_BIN"
 fi
