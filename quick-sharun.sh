@@ -1636,10 +1636,12 @@ _wine_fixes_after_deploy() {
 
 	_echo "* Applying wine fixes after deploy..."
 
-	# Symlink wine .so files to bin
-	if [ -d "$APPDIR/lib/wine/x86_64-unix" ]; then
-		ln -sr "$APPDIR"/lib/wine/x86_64-unix/*.so* "$DST_BIN_DIR" 2>/dev/null || :
-	fi
+	# Symlink wine .so files to bin and shared/bin so wine can find them
+	for dir in "$DST_BIN_DIR" "$SHARUN_BIN_DIR"; do
+		if [ -d "$APPDIR/lib/wine/x86_64-unix" ]; then
+			ln -sr "$APPDIR"/lib/wine/x86_64-unix/*.so* "$dir" 2>/dev/null || :
+		fi
+	done
 
 	# Wine binary gets broken by sharun — restore the real wine binary
 	# and preloader from shared/bin/ to lib/wine/x86_64-unix/
@@ -2985,12 +2987,13 @@ if [ -n "$WINE_MAIN_BIN" ]; then
 WINEPREFIX="\${XDG_DATA_HOME}/anylinux-wine/${WINE_MAIN_BIN%.exe}"
 export WINEDLLPATH="\${APPDIR}/lib/wine/x86_64-windows:\${APPDIR}/lib/wine/i386-windows"
 export LD_LIBRARY_PATH="\${APPDIR}/lib:\${APPDIR}/lib/wine/x86_64-unix:\${APPDIR}/lib/pulseaudio:\${APPDIR}/lib/alsa-lib"
+WINE="\${APPDIR}/shared/bin/wine"
 mkdir -p "\${WINEPREFIX}"
 cp -rn "\${APPDIR}/share/${WINE_MAIN_BIN%.exe}/." "\${WINEPREFIX}"
 if [ ! -f "\${WINEPREFIX}/system.reg" ]; then
-    wineboot
+    \$WINE wineboot
 fi
-wine "\${WINEPREFIX}/${WINE_MAIN_BIN}" "\$@"
+exec \$WINE "\${WINEPREFIX}/${WINE_MAIN_BIN}" "\$@"
 EOF
 	chmod +x "$DST_BIN_DIR"/"$MAIN_BIN"
 fi
