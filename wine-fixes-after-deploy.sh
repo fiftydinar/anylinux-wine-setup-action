@@ -31,10 +31,10 @@ chmod +x ./AppDir/bin/*.hook
 
 cat <<EOF > ./AppDir/bin/"$WINE_MAIN_BIN"
 #!/bin/sh
-if [ ! -d "\${XDG_DATA_HOME}/anylinux-wine/${WINE_MAIN_BIN}/.wine" ]; then
+if [ ! -d "\${WINEPREFIX}/.wine" ]; then
     wineboot
 fi
-wine "${WINE_MAIN_BIN}" "\$@"
+wine "\${WINEPREFIX}/${WINE_MAIN_BIN}" "\$@"
 EOF
 
 echo "WINEPREFIX=\${XDG_DATA_HOME}/anylinux-wine/${WINE_MAIN_BIN}" >> ./AppDir/.env
