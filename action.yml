@@ -1,5 +1,5 @@
 ---
-name: "AnyLinux Tools Setup (Arch)"
+name: "AnyLinux Wine Tools Setup (Arch)"
 description: "Downloads and installs Anylinux packaging tools and dependencies"
 runs:
   using: "composite"
