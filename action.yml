@@ -73,13 +73,6 @@ runs:
         _get_anylinux_tool "$ANYLINUX_TOOLS_DIR"/wine-strace "$WINE_STRACE"
         _get_anylinux_tool "$ANYLINUX_TOOLS_DIR"/wine-fixes-after-deploy "$WINE_FIXES_AFTER_DEPLOY"
 
-        chmod +x \
-            "$ANYLINUX_TOOLS_DIR"/quick-sharun \
-            "$ANYLINUX_TOOLS_DIR"/get-debloated-pkgs \
-            "$ANYLINUX_TOOLS_DIR"/make-aur-package \
-            "$ANYLINUX_TOOLS_DIR"/wine-strace \
-            "$ANYLINUX_TOOLS_DIR"/wine-fixes-after-deploy \            
-            /usr/bin/winetricks \
-            /usr/bin/zenity
+        chmod +x "$ANYLINUX_TOOLS_DIR"/*
 
         echo "CONTAINER IS READY! Tools installed in $ANYLINUX_TOOLS_DIR."
