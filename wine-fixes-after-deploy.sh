@@ -13,7 +13,7 @@ patchelf --set-interpreter /tmp/"$kek" ./AppDir/lib/wine/x86_64-unix/wine
 # we used to run patchelf --add-needed anylinux.so on the wine binary
 # but after 11.8 this causes the binary to break horribly:
 # AppDir/lib/wine/x86_64-unix/wine: oops... not enough space for load commands
-# so we will ahve to make sure anylinux.so loads by adding it as a dependency to the libc
+# so we will have to make sure anylinux.so loads by adding it as a dependency to the libc
 patchelf --add-needed anylinux.so ./AppDir/shared/lib/libc.so.6
 
 cat <<EOF > ./AppDir/bin/random-linker.hook
@@ -27,6 +27,18 @@ cat <<EOF > ./AppDir/bin/force-portable-home.hook
 export WINEPREFIX="${WINEPREFIX:-$HOME/.wine}"
 export WINE_HOST_XDG_CACHE_HOME="$XDG_CACHE_HOME"
 EOF
+chmod +x ./AppDir/bin/*.hook
+
+cat <<EOF > ./AppDir/bin/"$WINE_MAIN_BIN"
+#!/bin/sh
+if [ ! -d "\${XDG_DATA_HOME}/anylinux-wine/${WINE_MAIN_BIN}/.wine" ]; then
+    wineboot
+fi
+wine "${WINE_MAIN_BIN}" "\$@"
+EOF
+
+echo "WINEPREFIX=\${XDG_DATA_HOME}/anylinux-wine/${WINE_MAIN_BIN}" >> ./AppDir/.env
+
 chmod +x ./AppDir/bin/*.hook
 
 # Set the lib path to also use wine libs
