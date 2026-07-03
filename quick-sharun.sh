@@ -1641,21 +1641,10 @@ _wine_fixes_after_deploy() {
 		ln -sr "$APPDIR"/lib/wine/x86_64-unix/*.so* "$DST_BIN_DIR" 2>/dev/null || :
 	fi
 
-	# Wine binary gets broken by sharun, fix by copying fresh and patching interpreter
+	# Wine binary gets broken by sharun, fix by copying fresh
 	if [ -f /usr/lib/wine/x86_64-unix/wine ]; then
-		kek=.$(tr -dc 'A-Za-z0-9_=-' < /dev/urandom | head -c 10)
 		rm -f "$APPDIR"/lib/wine/x86_64-unix/wine
 		cp /usr/lib/wine/x86_64-unix/wine "$APPDIR"/lib/wine/x86_64-unix/wine
-		patchelf --set-interpreter /tmp/"$kek" "$APPDIR"/lib/wine/x86_64-unix/wine
-		# anylinux.so can't be added as --add-needed on wine binary (breaks after 11.8)
-		# so add it as a dependency to libc instead
-		patchelf --add-needed anylinux.so "$APPDIR"/shared/lib/libc.so.6
-
-		cat <<HOOKEOF > "$DST_BIN_DIR"/random-linker.hook
-#!/bin/sh
-cp -f "\$APPDIR"/shared/lib/ld-linux*.so* /tmp/"$kek"
-HOOKEOF
-	fi
 
 	cat <<HOOKEOF > "$DST_BIN_DIR"/force-portable-home.hook
 #!/bin/sh
@@ -2990,6 +2979,8 @@ if [ -n "$WINE_MAIN_BIN" ]; then
 	cat <<EOF > "$DST_BIN_DIR"/"$MAIN_BIN"
 #!/bin/sh
 WINEPREFIX="\${XDG_DATA_HOME}/anylinux-wine/${WINE_MAIN_BIN%.exe}"
+export WINEDLLPATH="\${APPDIR}/lib/wine/x86_64-windows:\${APPDIR}/lib/wine/i386-windows"
+export LD_LIBRARY_PATH="\${APPDIR}/lib:\${APPDIR}/lib/wine/x86_64-unix:\${APPDIR}/lib/pulseaudio:\${APPDIR}/lib/alsa-lib"
 mkdir -p "\${WINEPREFIX}"
 cp -rn "\${APPDIR}/share/${WINE_MAIN_BIN%.exe}/." "\${WINEPREFIX}"
 if [ ! -f "\${WINEPREFIX}/system.reg" ]; then
