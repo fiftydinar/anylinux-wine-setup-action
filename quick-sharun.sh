@@ -1631,6 +1631,59 @@ _add_gtk_class_fix() {
 	_echo "* gtk-class-fix.so successfully added!"
 }
 
+_wine_fixes_after_deploy() {
+	[ -n "$WINE_MAIN_BIN" ] || return 0
+
+	_echo "* Applying wine fixes after deploy..."
+
+	# Symlink wine .so files to bin
+	if [ -d "$APPDIR/lib/wine/x86_64-unix" ]; then
+		ln -sr "$APPDIR"/lib/wine/x86_64-unix/*.so* "$DST_BIN_DIR" 2>/dev/null || :
+	fi
+
+	# Wine binary gets broken by sharun, fix by copying fresh and patching interpreter
+	if [ -f /usr/lib/wine/x86_64-unix/wine ]; then
+		kek=.$(tr -dc 'A-Za-z0-9_=-' < /dev/urandom | head -c 10)
+		rm -f "$APPDIR"/lib/wine/x86_64-unix/wine
+		cp /usr/lib/wine/x86_64-unix/wine "$APPDIR"/lib/wine/x86_64-unix/wine
+		patchelf --set-interpreter /tmp/"$kek" "$APPDIR"/lib/wine/x86_64-unix/wine
+		# anylinux.so can't be added as --add-needed on wine binary (breaks after 11.8)
+		# so add it as a dependency to libc instead
+		patchelf --add-needed anylinux.so "$APPDIR"/shared/lib/libc.so.6
+
+		cat <<HOOKEOF > "$DST_BIN_DIR"/random-linker.hook
+#!/bin/sh
+cp -f "\$APPDIR"/shared/lib/ld-linux*.so* /tmp/"$kek"
+HOOKEOF
+	fi
+
+	cat <<HOOKEOF > "$DST_BIN_DIR"/force-portable-home.hook
+#!/bin/sh
+# wine ignores the HOME env var, which means --appimage-portable-home does not work normally
+export WINE_HOST_XDG_CACHE_HOME="$XDG_CACHE_HOME"
+HOOKEOF
+	chmod +x "$DST_BIN_DIR"/*.hook
+
+	echo "WINEPREFIX=\${XDG_DATA_HOME}/anylinux-wine/${WINE_MAIN_BIN}" >> "$APPDIR"/.env
+
+	# Set the lib path to also use wine libs
+	echo 'LD_LIBRARY_PATH=${APPDIR}/lib:${APPDIR}/lib/pulseaudio:${APPDIR}/lib/alsa-lib:${APPDIR}/lib/wine/x86_64-unix' >> "$APPDIR"/.env
+
+	# Remove wine static libs
+	find "$APPDIR"/lib/ -type f -name '*.a' -delete 2>/dev/null || :
+
+	# Strip windows libs, inspired by alpine linux:
+	# https://gitlab.alpinelinux.org/alpine/aports/-/blob/master/community/wine/APKBUILD
+	if [ "$ARCH" = 'x86_64' ]; then
+		set +e
+		x86_64-w64-mingw32-strip -R .comment --strip-unneeded "$APPDIR"/lib/wine/x86_64-windows/*.dll 2>/dev/null
+		i686-w64-mingw32-strip   -R .comment --strip-unneeded "$APPDIR"/lib/wine/i386-windows/*.dll 2>/dev/null
+		set -e
+	fi
+
+	_echo "* Wine fixes applied!"
+}
+
 _check_always_software() {
 	if [ "$ALWAYS_SOFTWARE" != 1 ]; then
 		return 0
@@ -2946,6 +2999,7 @@ _map_paths_binary_patch
 _add_anylinux_lib
 _check_window_class
 _add_gtk_class_fix
+_wine_fixes_after_deploy
 
 echo ""
 _echo "------------------------------------------------------------"
