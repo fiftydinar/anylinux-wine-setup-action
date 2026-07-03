@@ -133,8 +133,16 @@ else
 fi
 
 # If arg is an executable, find all exes and trace each one
-case "$1" in
-  *.exe|*.EXE)
+# Detect PE by extension or by MZ magic header
+_is_pe() {
+  case "$1" in
+    *.exe|*.EXE) return 0 ;;
+  esac
+  [ -f "$1" ] || return 1
+  head -c 2 "$1" 2>/dev/null | grep -qa 'MZ'
+}
+
+if _is_pe "$1"; then
     exe_path="$1"
     app_dir=$(dirname "$exe_path")
 
@@ -163,12 +171,13 @@ case "$1" in
     rm -rf "$WINEPREFIX"
 	mkdir -p "$WINEPREFIX"
     _echo "* Creating fresh prefix..."
-   if [ -n "$XVFB_CMD" ]; then
-     $XVFB_CMD env WINEDLLOVERRIDES="mscoree=d;mshtml=d" wine wineboot -u 2>/dev/null
-   else
-     WINEDLLOVERRIDES="mscoree=d;mshtml=d" wine wineboot -u 2>/dev/null
-   fi
-   trace=$(mktemp /tmp/wine-trace-XXXXXX.txt)
+    if [ -n "$XVFB_CMD" ]; then
+      $XVFB_CMD env WINEDLLOVERRIDES="mscoree=d;mshtml=d" wine wineboot -u 2>/dev/null
+    else
+      WINEDLLOVERRIDES="mscoree=d;mshtml=d" wine wineboot -u 2>/dev/null
+    fi
+    [ -d "$WINEPREFIX/drive_c/windows" ] || { _err_msg "ERROR: Failed to create Wine prefix at $WINEPREFIX (wineboot failed)"; exit 1; }
+    trace=$(mktemp /tmp/wine-trace-XXXXXX.txt)
 
     for exe in $all_exes; do
       _echo "STRACE: [$exe] ..."
@@ -189,12 +198,10 @@ case "$1" in
       wineserver -k 2>/dev/null || wine wineserver -k 2>/dev/null || :
     done
     pid=1  # flag that we created a temp trace
-    ;;
-  *)
+else
     trace="$1"
     [ -f "$trace" ] || { _err_msg "ERROR: File not found: $trace"; exit 1; }
-    ;;
-esac
+fi
 
 cd "$WINEPREFIX/drive_c/windows" || exit 1
 
