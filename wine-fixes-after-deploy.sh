@@ -42,6 +42,8 @@ find ./AppDir/lib/ -type f -name '*.a' -delete
 # strip windows libs, inspired by alpine linux: 
 # https://gitlab.alpinelinux.org/alpine/aports/-/blob/master/community/wine/APKBUILD
 if [ "$ARCH" = 'x86_64' ]; then
-	x86_64-w64-mingw32-strip -R .comment --strip-unneeded ./AppDir/lib/wine/x86_64-windows/*.dll
-	i686-w64-mingw32-strip   -R .comment --strip-unneeded ./AppDir/lib/wine/i386-windows/*.dll
+	set +e
+	x86_64-w64-mingw32-strip -R .comment --strip-unneeded ./AppDir/lib/wine/x86_64-windows/*.dll 2>/dev/null
+	i686-w64-mingw32-strip   -R .comment --strip-unneeded ./AppDir/lib/wine/i386-windows/*.dll 2>/dev/null
+	set -e
 fi
