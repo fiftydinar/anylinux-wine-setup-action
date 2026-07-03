@@ -2927,14 +2927,7 @@ echo ""
 _echo "------------------------------------------------------------"
 echo ""
 
-_check_main_bin
-_map_paths_ld_preload_open
-_map_paths_binary_patch
-_add_anylinux_lib
-_check_window_class
-_add_gtk_class_fix
-
-# WINE_MAIN_BIN: create wrapper script for Wine apps
+# WINE_MAIN_BIN: create wrapper script for Wine apps (before _check_main_bin validates it)
 if [ -n "$WINE_MAIN_BIN" ]; then
 	cat <<EOF > "$DST_BIN_DIR"/"$WINE_MAIN_BIN"
 #!/bin/sh
@@ -2946,6 +2939,13 @@ wine "\${WINEPREFIX}/${WINE_MAIN_BIN}/${WINE_MAIN_BIN}" "\$@"
 EOF
 	chmod +x "$DST_BIN_DIR"/"$WINE_MAIN_BIN"
 fi
+
+_check_main_bin
+_map_paths_ld_preload_open
+_map_paths_binary_patch
+_add_anylinux_lib
+_check_window_class
+_add_gtk_class_fix
 
 echo ""
 _echo "------------------------------------------------------------"
