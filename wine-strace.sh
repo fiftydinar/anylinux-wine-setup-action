@@ -142,7 +142,29 @@ _is_pe() {
   head -c 2 "$1" 2>/dev/null | grep -qa 'MZ'
 }
 
-if _is_pe "$1"; then
+if [ -d "$1" ]; then
+    # Directory: trace all .exe files inside it
+    app_dir="$1"
+    exe_path=""
+    all_exes=$(find "$app_dir" -type f \( -name '*.exe' -o -name '*.EXE' \) 2>/dev/null | sort -u)
+
+    if [ -n "$WINE_STRACE_BINARY" ]; then
+      filtered=""
+      for exe in $all_exes; do
+        base=$(basename "$exe")
+        for name in $WINE_STRACE_BINARY; do
+          [ "$base" = "$name" ] && { filtered="$filtered $exe"; break; }
+        done
+      done
+      all_exes=$filtered
+    fi
+
+    if [ -z "$all_exes" ]; then
+      _err_msg "ERROR: No .exe files found in $app_dir"
+      exit 1
+    fi
+
+elif _is_pe "$1"; then
     exe_path="$1"
     app_dir=$(dirname "$exe_path")
 
@@ -174,10 +196,16 @@ if _is_pe "$1"; then
       exit 1
     fi
 
+else
+    trace="$1"
+    [ -f "$trace" ] || { _err_msg "ERROR: File not found: $trace"; exit 1; }
+fi
+
+if [ -n "$all_exes" ]; then
     _echo "* Removing existing prefix..."
     wineserver -k 2>/dev/null
     rm -rf "$WINEPREFIX"
-	mkdir -p "$WINEPREFIX"
+    mkdir -p "$WINEPREFIX"
     _echo "* Creating fresh prefix..."
     if [ -n "$XVFB_CMD" ]; then
       $XVFB_CMD env WINEDLLOVERRIDES="mscoree=d;mshtml=d" wine wineboot -u 2>/dev/null
@@ -206,9 +234,6 @@ if _is_pe "$1"; then
       wineserver -k 2>/dev/null || wine wineserver -k 2>/dev/null || :
     done
     pid=1  # flag that we created a temp trace
-else
-    trace="$1"
-    [ -f "$trace" ] || { _err_msg "ERROR: File not found: $trace"; exit 1; }
 fi
 
 cd "$WINEPREFIX/drive_c/windows" || exit 1
