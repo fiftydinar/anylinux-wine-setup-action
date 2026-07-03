@@ -2995,7 +2995,7 @@ if [ ! -d "\${WINEPREFIX}" ]; then
     wineboot
 fi
 cp -rn "\${APPDIR}/share/${WINE_MAIN_BIN%.exe}" "\${WINEPREFIX}"
-wine "\${WINEPREFIX}/${WINE_MAIN_BIN%.exe}/${WINE_MAIN_BIN}" "\$@"
+wine "\${WINEPREFIX}/${WINE_MAIN_BIN}" "\$@"
 EOF
 	chmod +x "$DST_BIN_DIR"/"$MAIN_BIN"
 fi
