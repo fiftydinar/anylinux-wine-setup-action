@@ -2989,15 +2989,15 @@ echo ""
 
 # WINE_MAIN_BIN: create wrapper script for Wine apps (before _check_main_bin validates it)
 if [ -n "$WINE_MAIN_BIN" ]; then
-	cat <<EOF > "$DST_BIN_DIR"/"$WINE_MAIN_BIN"
+	cat <<EOF > "$DST_BIN_DIR"/"$MAIN_BIN"
 #!/bin/sh
 if [ ! -d "\${WINEPREFIX}" ]; then
     wineboot
 fi
-cp -rn "\${APPDIR}/share/${WINE_MAIN_BIN}" "\${WINEPREFIX}"
-wine "\${WINEPREFIX}/${WINE_MAIN_BIN}/${WINE_MAIN_BIN}.exe" "\$@"
+cp -rn "\${APPDIR}/share/${WINE_MAIN_BIN%.exe}" "\${WINEPREFIX}"
+wine "\${WINEPREFIX}/${WINE_MAIN_BIN%.exe}/${WINE_MAIN_BIN}" "\$@"
 EOF
-	chmod +x "$DST_BIN_DIR"/"$WINE_MAIN_BIN"
+	chmod +x "$DST_BIN_DIR"/"$MAIN_BIN"
 fi
 
 _check_main_bin
