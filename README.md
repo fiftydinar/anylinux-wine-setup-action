@@ -1,0 +1,1 @@
+# anylinux-wine-setup-action
