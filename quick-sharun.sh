@@ -2934,6 +2934,19 @@ _add_anylinux_lib
 _check_window_class
 _add_gtk_class_fix
 
+# WINE_MAIN_BIN: create wrapper script for Wine apps
+if [ -n "$WINE_MAIN_BIN" ]; then
+	cat <<EOF > "$DST_BIN_DIR"/"$WINE_MAIN_BIN"
+#!/bin/sh
+if [ ! -d "\${WINEPREFIX}" ]; then
+    wineboot
+fi
+cp -rn \${APPDIR}/share/"${WINE_MAIN_BIN}" "\${WINEPREFIX}"
+wine "\${WINEPREFIX}/${WINE_MAIN_BIN}/${WINE_MAIN_BIN}" "\$@"
+EOF
+	chmod +x "$DST_BIN_DIR"/"$WINE_MAIN_BIN"
+fi
+
 echo ""
 _echo "------------------------------------------------------------"
 _echo "Finished deployment! Starting post deployment hooks..."
