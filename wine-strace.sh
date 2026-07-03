@@ -146,8 +146,16 @@ if _is_pe "$1"; then
     exe_path="$1"
     app_dir=$(dirname "$exe_path")
 
-    # Find all .exe files in the app directory tree
-    all_exes=$(find "$app_dir" -type f \( -name '*.exe' -o -name '*.EXE' \) 2>/dev/null | sort -u)
+    # If arg has .exe extension, search the directory tree for all exes
+    # If arg is a PE without extension, trace only that single file
+    case "$exe_path" in
+      *.exe|*.EXE)
+        all_exes=$(find "$app_dir" -type f \( -name '*.exe' -o -name '*.EXE' \) 2>/dev/null | sort -u)
+        ;;
+      *)
+        all_exes="$exe_path"
+        ;;
+    esac
 
     # Filter by WINE_STRACE_BINARY if set
     if [ -n "$WINE_STRACE_BINARY" ]; then
