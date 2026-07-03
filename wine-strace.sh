@@ -416,7 +416,7 @@ always_dll="mpr.dll comdlg32.dll"
 wow64="wow64.dll wow64cpu.dll wow64win.dll"
 
 keep_dll=$(printf '%s\n%s\n%s\n%s\n%s' "$loaded" "$always_dll" "$wow64" "$objdump_imports" "$delay_imports" | grep '\.dll$' | sort -u)
-always_exe="explorer.exe"
+always_exe="explorer.exe wineboot.exe services.exe winedevice.exe plugplay.exe rpcss.exe svchost.exe conhost.exe"
 keep_exe=$(printf '%s\n%s' "$loaded" "$always_exe" | grep '\.exe$' | sort -u)
 keep_sys=$(printf '%s' "$loaded" | grep '\.sys$' | sort -u)
 keep_drv=$(printf '%s' "$loaded" | grep '\.drv$' | sort -u)
